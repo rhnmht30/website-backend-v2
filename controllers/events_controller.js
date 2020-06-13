@@ -683,6 +683,7 @@ module.exports.updateEvent = async (req, res) => {
 module.exports.deleteEvent = async (req, res) => {
 	let { eid } = req.params;
 	let event = await Event.findById(eid);
+	console.log("event: ", event);
 	if (event) {
 		if (event.image && event.image.includes("amazonaws")) {
 			let key = `${event.image.split("/")[3]}/${

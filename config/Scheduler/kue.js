@@ -4,6 +4,7 @@ const Queue = kue.createQueue({
 });
 
 module.exports.scheduleJob = data => {
+	console.log("Coming here");
 	if (data.time !== 1000) {
 		console.log(`${data.jobName} job scheduled at: ${new Date(data.time)}`);
 	}

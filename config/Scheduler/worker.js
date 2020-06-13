@@ -37,22 +37,27 @@ Queue.process("deleteEvent", async (job, done) => {
 		Attendance.deleteMany({ eid: new ObjectId(eid) }),
 		Feedback.deleteMany({ eid: new ObjectId(eid) })
 	];
-
-	let participants = await Participant.find({
-		"events.eid": new ObjectId(eid)
-	});
-	participants.map(part => {
-		let eventInd = part.events
-			.map(evnt => {
-				return String(evnt.eid);
-			})
-			.indexOf(String(eid));
-		part.events.splice(eventInd, 1);
-		promises.push(part.save());
-	});
-
-	await Promise.all(promises);
-	done();
+	try {
+		let participants = await Participant.find({
+			"events.eid": new ObjectId(eid)
+		});
+		participants.map(part => {
+			let eventInd = part.events
+				.map(evnt => {
+					return String(evnt.eid);
+				})
+				.indexOf(String(eid));
+			part.events.splice(eventInd, 1);
+			promises.push(part.save());
+		});
+		console.log("total promises: ", promises.length);
+		let returned = await Promise.all(promises);
+		console.log("Returned:  ", returned);
+		done();
+	} catch (error) {
+		console.error(error);
+		console.error(error.message);
+	}
 });
 
 Queue.process("sendGeneralEmailJob", async (job, done) => {
