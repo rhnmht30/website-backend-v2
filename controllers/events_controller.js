@@ -303,6 +303,15 @@ module.exports.deleteParticipant = async (req, res) => {
 		await deleteImage(key);
 	}
 
+	if (part.events.length !== 0) {
+		let eventIds = part.events.map(event => event.eid);
+		for (let i = 0; i < eventIds.length; i++) {
+			let rr = await Event.findByIdAndUpdate(eventIds[i], {
+				$inc: { registrations: -1 }
+			});
+		}
+	}
+
 	let deletePromises = [
 		part.delete(),
 		Attendance.deleteOne({ pid: new ObjectId(pid) }),
@@ -1176,7 +1185,7 @@ module.exports.generateCerti = async (req, res) => {
 
 	if (participant.events[eventInd].status === "attended") {
 		//get certi meta
-		if (event.certificateMeta !== undefined) {
+		if (event.certificateMeta.pdfFileName !== undefined) {
 			let {
 					pdfFileName,
 					fontFileName,
